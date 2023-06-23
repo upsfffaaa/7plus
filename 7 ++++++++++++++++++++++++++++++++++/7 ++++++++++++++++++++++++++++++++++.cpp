@@ -54,7 +54,7 @@ int main() {
         int age = 0, id = 0;
 
         cout << "Enter person's name: ";
-        getline(cin, name);
+        cin>> name;
 
         cout << "Enter person's age: ";
         cin >> age;
