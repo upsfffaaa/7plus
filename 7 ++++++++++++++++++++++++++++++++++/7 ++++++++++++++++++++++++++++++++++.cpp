@@ -1,81 +1,50 @@
-﻿#include <iostream>
-#include <memory>
-
-using namespace std;
-
-class PersonException : public exception {
+class PersonException : public std::exception {
 public:
-    PersonException(const string& message) : exception(message.c_str()) {}
+    const char* what() const noexcept override {
+        return "Ошибка: некорректные данные о человеке!";
+    }
 };
 
 class Person {
 private:
-    string name;
+    std::string name;
     int age;
     int id;
-
 public:
-    Person(const string& name, int age, int id) : name(name), age(age), id(id) {}
-
-    void setName(const string& name) {
-        this->name = name;
-    }
-
-    void setAge(int age) {
-        this->age = age;
-    }
-
-    void setId(int id) {
-        this->id = id;
-    }
-
-    const string& getName() const {
-        return name;
-    }
-
-    int getAge() const {
-        return age;
-    }
-
-    int getId() const {
-        return id;
-    }
-
-    void validate() const {
-        if (age <= 0 || id <= 0) {
-            throw PersonException("Invalid person data.");
+    Person(const std::string& name, int age, int id) : name(name), age(age), id(id) {
+        if (name.empty()  age <= 0  id < 0) {
+            throw PersonException();
         }
+    }
+    void printInfo() const {
+        std::cout << "Имя: " << name << std::endl;
+        std::cout << "Возраст: " << age << std::endl;
+        std::cout << "Идентификатор: " << id << std::endl;
     }
 };
 
 int main() {
+    setlocale(LC_ALL, "ru");
+    setlocale(LC_ALL, "Russian");
     try {
-        string name;
-        int age = 0, id = 0;
+        std::string name;
+        int age, id;
 
-        cout << "Enter person's name: ";
-        cin>> name;
+        std::cout << "Введите имя: ";
+        std::cin >> name;
+        std::cout << "Введите возраст: ";
+        std::cin >> age;
+        std::cout << "Введите идентификатор: ";
+        std::cin >> id;
 
-        cout << "Enter person's age: ";
-        cin >> age;
-
-        cout << "Enter person's ID: ";
-        cin >> id;
-
-        Person person(name, age, id);
-
-        person.validate();
-
-        cout << "Person information:" << endl;
-        cout << "Name: " << person.getName() << endl;
-        cout << "Age: " << person.getAge() << endl;
-        cout << "ID: " << person.getId() << endl;
+        std::unique_ptr<Person> person(new Person(name, age, id));
+        person->printInfo();
     }
-    catch (const PersonException& e) {
-        cout << "Error: " << e.what() << endl;
+    catch (PersonException& ex) {
+        std::cerr << ex.what() << std::endl;
     }
-    catch (const exception& e) {
-        cout << "Error: " << e.what() << endl;
+    catch (std::exception& ex) {
+        std::cerr << "Ошибка: " << ex.what() << std::endl;
     }
 
     return 0;
